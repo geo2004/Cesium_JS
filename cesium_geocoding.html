@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Include the CesiumJS JavaScript and CSS files -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.29/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.29/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    // Your access token can be found at: https://cesium.com/ion/tokens.
+    // This is the default access token from your ion account
+
+Cesium.BingMapsApi.defaultKey = 'Al1HksMiWHjY_8Dp_Z-sqUibBFEdyZaZN8y96_UKcEv8GLpjJmGQMG5tkIlVN832';
+
+
+   
+var viewer = new Cesium.Viewer('cesiumContainer');
+var camera = viewer.camera;
+var ellipsoid = viewer.scene.globe.ellipsoid;
+
+var baseUrl = 'https://dev.virtualearth.net/REST/v1/Locations/';
+
+function setAddressPoint(position, locationAddress, longitudeDegrees, latitudeDegrees ) {
+    viewer.entities.add({
+        name : 'Longitude:' + longitudeDegrees.toFixed(4) + ', Latitude: ' + latitudeDegrees.toFixed(4),
+        position : position,
+        point : {
+            pixelSize : 5,
+            color : Cesium.Color.RED,
+            outlineColor : Cesium.Color.WHITE,
+            outlineWidth : 2
+        },
+        label : {
+            text : locationAddress,
+            font : '14pt monospace',
+            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+            outlineWidth : 2,
+            verticalOrigin : Cesium.VerticalOrigin.BOTTOM,
+            pixelOffset : new Cesium.Cartesian2(0, -5)
+        }
+    });
+}
+
+var handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+handler.setInputAction(function (click) {
+    var position = camera.pickEllipsoid(click.position);
+    if (Cesium.defined(position)) {
+        var cartographic = ellipsoid.cartesianToCartographic(position);
+        var longitudeDegrees = Cesium.Math.toDegrees(cartographic.longitude);
+        var latitudeDegrees = Cesium.Math.toDegrees(cartographic.latitude);
+        var url = baseUrl + latitudeDegrees + "," +longitudeDegrees;
+        var promise = Cesium.loadJsonp(url, {
+            parameters : {
+                key : Cesium.BingMapsApi.getKey()
+            },
+            callbackParameterName : 'jsonp'
+        });
+
+        promise.then(function(result) {
+            var resources = result.resourceSets[0].resources;
+            if (resources.length === 0) {
+                return;
+            }
+            var locationAddress = resources[0].name;
+            if (locationAddress.length > 15) {
+                locationAddress = locationAddress.replace(/, /g, '\n');
+            }
+            setAddressPoint(position, locationAddress, longitudeDegrees, latitudeDegrees);
+        }).otherwise(function(error) {
+            console.error("ERROR getting address: " + error);
+        });
+    }
+}, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  </script>
+ </div>
+</body>
+</html>
