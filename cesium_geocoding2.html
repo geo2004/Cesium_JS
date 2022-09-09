@@ -49,11 +49,11 @@ handler.setInputAction(function (click) {
         var cartographic = ellipsoid.cartesianToCartographic(position);
         var longitudeDegrees = Cesium.Math.toDegrees(cartographic.longitude);
         var latitudeDegrees = Cesium.Math.toDegrees(cartographic.latitude);
-        var url = baseUrl + latitudeDegrees + "," +longitudeDegrees + "&key=Al1HksMiWHjY_8Dp_Z-sqUibBFEdyZaZN8y96_UKcEv8GLpjJmGQMG5tkIlVN832";
+        var url = baseUrl + latitudeDegrees + "," +longitudeDegrees + "?" + "&key=Al1HksMiWHjY_8Dp_Z-sqUibBFEdyZaZN8y96_UKcEv8GLpjJmGQMG5tkIlVN832";
         var promise = Cesium.Resource.fetchJson(url);
 
-        promise.then(function(result) {
-            var resources = result.resourceSets[0].resources;
+        promise.then(function(results) {
+            var resources = results.resourceSets[0].resources;
             if (resources.length === 0) {
                 return;
             }
