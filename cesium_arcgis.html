@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!-- Include the CesiumJS JavaScript and CSS files -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.97/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.97/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <script>
+    // Your access token can be found at: https://cesium.com/ion/tokens.
+    // This is the default access token from your ion account
+
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI0NWUzNzM4Mi1mMzRlLTRmYzMtODc1MS0wZWQ3Nzk3OGIzMjciLCJpZCI6MTA3NDY1LCJpYXQiOjE2NjI2NDUyNDN9.VjPgmQQddl4kqk9FJeQat7n63i2jke9HpFG1OZu2a28';
+
+    // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      terrainProvider: Cesium.createWorldTerrain()
+    });    
+	
+    // Add Cesium OSM Buildings, a global 3D buildings layer.
+       
+	
+	var provider = new Cesium.ArcGisMapServerImageryProvider({
+    url : 'https://env1.arcgis.com/arcgis/rest/services/Sentinel2_10m_LandCover/ImageServer',
+    layers : '0',
+    proxy: new Cesium.DefaultProxy('/proxy/')
+});
+
+viewer.imageryLayers.addImageryProvider(provider);
+
+  </script>
+ </div>
+</body>
+</html>
